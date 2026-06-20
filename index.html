@@ -5,125 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جاري توجيهك بأمان...</title>
     <style>
-        :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --text-color: #c9d1d9;
-            --accent-color: #58a6ff;
-            --button-bg: #21262d;
-            --button-hover: #30363d;
-        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
         }
         .container {
-            background-color: var(--card-bg);
+            background-color: #161b22;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
             text-align: center;
-            max-width: 450px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            border: 1px solid #30363d;
+            max-width: 400px;
             width: 100%;
-            border: 1px solid #30363d;
         }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin-bottom: 15px;
-        }
-        .message {
-            font-size: 18px;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-        .countdown {
-            font-size: 48px;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin: 20px 0;
-        }
-        .btn {
-            display: inline-block;
-            background-color: var(--button-bg);
-            color: var(--accent-color);
-            padding: 12px 24px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            border: 1px solid #30363d;
-            transition: all 0.2s;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: var(--button-hover);
-            border-color: #8b949e;
-        }
-        .footer {
-            margin-top: 25px;
-            font-size: 12px;
-            color: #8b949e;
-        }
+        .logo { font-size: 24px; font-weight: bold; color: #58a6ff; margin-bottom: 15px; }
+        .countdown { font-size: 50px; font-weight: bold; color: #58a6ff; margin: 20px 0; }
+        .btn { display: inline-block; background-color: #21262d; color: #58a6ff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid #30363d; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="logo">Tech Kuala Bridge</div>
-    <div class="message" id="msg">جاري فحص الرابط وتجهيز المقال لك...</div>
+    <div id="msg">جاري تجهيز الرابط المباشر للمقال...</div>
     <div class="countdown" id="timer">5</div>
-    <a id="action-btn" class="btn" style="display: none;">الانتقال للمقال الآن</a>
-    <div class="footer">جسر تحويل آمن وموثوق لمدونة Tech Kuala</div>
+    <a id="action-btn" class="btn" style="display: none;">اضغط هنا للانتقال المباشر</a>
 </div>
 
 <script>
-    // دالة ذكية ومضمونة لجلب الرابط مهما كان شكله
-    function getTargetUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        let target = urlParams.get('url');
-        
-        // إذا لم يجد ?url= حاول البحث في الرابط بالكامل عن أي رابط يبدأ بـ http
-        if (!target) {
-            const currentHref = window.location.href;
-            const httpIndex = currentHref.indexOf('http', 10); // تخطي http الأولى الخاصة بجيت هاب
-            if (httpIndex !== -1) {
-                target = currentHref.substring(httpIndex);
-            }
+    function getUrl() {
+        const params = new URLSearchParams(window.location.search);
+        let url = params.get('url');
+        if(!url) {
+            const current = window.location.href;
+            const idx = current.indexOf('http', 10);
+            if(idx !== -1) { url = current.substring(idx); }
         }
-        
-        // رابط احتياطي للمدونة الرئيسية لو تعطل كل شيء
-        return target || "https://www.techkuala.com/";
+        return url || "https://www.techkuala.com/";
     }
 
-    const destination = getTargetUrl();
-    let timeLeft = 5;
-    const timerElement = document.getElementById('timer');
-    const msgElement = document.getElementById('msg');
-    const actionBtn = document.getElementById('action-btn');
+    const target = getUrl();
+    let seconds = 5;
+    const timerText = document.getElementById('timer');
 
-    const countdownInterval = setInterval(() => {
-        timeLeft--;
-        timerElement.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-            clearInterval(countdownInterval);
-            msgElement.textContent = "تم تجهيز الرابط بنجاح! جاري تحويلك...";
-            timerElement.style.display = 'none';
-            actionBtn.href = destination;
-            actionBtn.style.display = 'inline-block';
-            
-            // تحويل تلقائي مباشر
-            window.location.href = destination;
+    const counter = setInterval(function() {
+        seconds--;
+        timerText.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(counter);
+            document.getElementById('msg').textContent = "تم تجهيز الرابط!";
+            timerText.style.display = 'none';
+            const btn = document.getElementById('action-btn');
+            btn.href = target;
+            btn.style.display = 'inline-block';
+            window.location.href = target;
         }
     }, 1000);
 </script>
